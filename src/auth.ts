@@ -5,7 +5,7 @@ import { IAccessData, IUserData } from './types';
 
 export const handleAuthResponse = (APP_ID: string, SECRET: string) => {
   return async (ctx: Context, next: Next, redirectWithQueries?: string, log?: boolean) => {
-    // console.log('req, res', req, res);
+    // if (log) console.log('redirectWithQueries', redirectWithQueries);
     try {
       const code = ctx.request.query.code;
       if (log) console.log('==============got code==============\n', code);

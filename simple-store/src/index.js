@@ -4,8 +4,11 @@ const dotenv = require('dotenv');
 const app = new Koa();
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
-var ip = require('ip');
-var serve = require('koa-static');
+const ip = require('ip');
+const serve = require('koa-static');
+const send = require('koa-send');
+const Router = require('koa-router');
+const onerror = require('koa-onerror');
 
 dotenv.config({ path: './.env' });
 const PORT = process.env.PORT || 3000;
@@ -13,29 +16,35 @@ const YOUR_APP_SECRET = process.env.APP_SECRET;
 const YOUR_APP_ID = process.env.APP_ID;
 
 // const DotWallet = require('dotwallet-koa');
-const DotWallet = require('../../src/index.js');
+const DotWallet = require('../../lib/index.js');
 const dotwallet = DotWallet(YOUR_APP_ID, YOUR_APP_SECRET);
 app.use(cors());
-app.use(bodyParser);
+app.use(bodyParser());
 app.use(serve('src'));
+const router = new Router();
+onerror(app);
 /**
  *
  * ============================AUTHENTICATION============================
  *
  */
 
-app.get('/restricted-page', async (req, res) => {
-  res.sendFile(path.join(__dirname + '/restricted-page.html'));
+router.get('/', async (ctx) => {
+  await send(ctx, '/index.html', { root: __dirname });
+});
+router.get('/restricted-page', async (ctx) => {
+  await send(ctx, '/restricted-page.html', { root: __dirname });
 });
 
 let accessTokenStorage = ''; // These would go to your database in a real app
 let refreshTokenStorage = '';
 
-app.get('/auth', async (req, res, next) => {
-  const authResponse = await dotwallet.handleAuthResponse(req, res, next, '/restricted-page/', true);
+router.get('/auth', async (ctx, next) => {
+  const authResponse = await dotwallet.handleAuthResponse(ctx, next, '/restricted-page/', true);
   refreshTokenStorage = authResponse.accessData.refresh_token;
   accessTokenStorage = authResponse.accessData.access_token;
 });
+
 const refreshAccessToken = (refreshTokenStorage) => {
   dotwallet.refreshAccess(refreshTokenStorage).then((result) => {
     refreshTokenStorage = result.refresh_token;
@@ -49,26 +58,26 @@ const refreshAccessToken = (refreshTokenStorage) => {
  *
  */
 
-app.get('/store-front', async (req, res) => {
-  res.sendFile(path.join(__dirname + '/store-front.html'));
+router.get('/store-front', async (ctx) => {
+  await send(ctx, '/store-front.html', { root: __dirname });
 });
-app.get('/order-fulfilled', async (req, res) => {
-  res.sendFile(path.join(__dirname + '/order-fulfilled.html'));
+router.get('/order-fulfilled', async (ctx) => {
+  await send(ctx, '/order-fulfilled.html', { root: __dirname });
 });
 
-app.post('/create-order', async (req, res) => {
-  const merchant_order_sn = req.body.merchant_order_sn;
-  const order_sn = await dotwallet.handleOrder(req.body, true);
+router.post('/create-order', async (ctx) => {
+  const merchant_order_sn = ctx.request.body.merchant_order_sn;
+  const order_sn = await dotwallet.handleOrder(ctx.request.body, true);
   setTimeout(async () => {
     const orderStatus = await dotwallet.getOrderStatus(merchant_order_sn, true);
     console.log('==============orderStatus==============\n', orderStatus);
   }, 1000 * 60);
-  res.json({ order_sn });
+  ctx.body = { order_sn };
 });
 
-app.get('/payment-result', (req, res) => {
+router.get('/payment-result', (ctx) => {
   // the response from 'notice_uri' will be in the request queries
-  console.log('==============payment-result req==============\n', req.query);
+  console.log('==============payment-result req==============\n', ctx.request.query);
 });
 
 /**
@@ -77,14 +86,14 @@ app.get('/payment-result', (req, res) => {
  *
  */
 
-app.get('/autopayment-store', async (req, res) => {
-  res.sendFile(path.join(__dirname + '/autopayment-store.html'));
+router.get('/autopayment-store', async (ctx) => {
+  await send(ctx, '/autopayment-store.html', { root: __dirname });
 });
 
-app.post('/create-autopayment', async (req, res) => {
-  const orderResultData = await dotwallet.autopayment(req.body, true);
+router.post('/create-autopayment', async (ctx) => {
+  const orderResultData = await dotwallet.autopayment(ctx.request.body, true);
   console.log('orderResultData', orderResultData);
-  res.json(orderResultData);
+  ctx.body = orderResultData;
 });
 
 /**
@@ -95,9 +104,9 @@ app.post('/create-autopayment', async (req, res) => {
 
 const savedDataTxns = []; // In real app could store in DB. Save a list of txns to retrieve data
 
-app.post('/save-data', async (req, res) => {
+router.post('/save-data', async (ctx) => {
   try {
-    const data = req.body;
+    const data = ctx.request.body;
     // check if recieve address is dev's own
     console.log('==============data==============\n', data);
 
@@ -116,13 +125,15 @@ app.post('/save-data', async (req, res) => {
       timestamp: new Date(),
       tag: 'banana-price',
     }); //in a real app this would go to DB
-    res.json(saveDataData.data);
+    ctx.body - saveDataData.data;
   } catch (err) {
     console.log(err.msg, err.data, err.message, err.response);
     console.log('==============err==============\n', err);
-    res.json(err);
+    ctx.body = err;
   }
 });
+
+app.use(router.routes()).use(router.allowedMethods());
 
 app.listen(PORT, () =>
   console.log(

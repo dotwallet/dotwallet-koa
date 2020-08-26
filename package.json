@@ -1,6 +1,6 @@
 {
   "name": "dotwallet-koa",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An SDK for quickly building a Koa.js server that uses dotwallet's APIs",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -31,17 +31,14 @@
   },
   "homepage": "https://github.com/dotwallet/dotwallet-express#readme",
   "dependencies": {
-    "@koa/cors": "^3.1.0",
-    "@types/koa": "^2.11.4",
     "axios": "^0.19.2",
     "crypto": "^1.0.1",
-    "koa": "^2.13.0",
-    "koa-bodyparser": "^4.3.0",
-    "koa-static": "^5.0.0",
     "md5": "^2.3.0",
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "koa": "^2.13.0",
+    "@types/koa": "^2.11.4",
     "@types/md5": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "^3.8.0",
     "@typescript-eslint/parser": "^3.8.0",
