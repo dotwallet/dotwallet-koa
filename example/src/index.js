@@ -91,7 +91,7 @@ router.get('/autopayment-store', async (ctx) => {
 });
 
 router.post('/create-autopayment', async (ctx) => {
-  const orderResultData = await dotwallet.autopayment(ctx.request.body, true);
+  const orderResultData = await dotwallet.autopayment(ctx, ctx.request.body, true);
   console.log('orderResultData', orderResultData);
   ctx.body = orderResultData;
 });

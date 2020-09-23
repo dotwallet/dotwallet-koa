@@ -33,11 +33,12 @@ export interface IAutoPaymentOrder {
     recieve_address?: string;
 }
 export interface IOrderResponseData {
-    order_sn: string;
-    pay_txid: string;
-    paytxid: string;
-    txid: string;
-    rawtx: string;
+    order_sn?: string;
+    pay_txid?: string;
+    paytxid?: string;
+    txid?: string;
+    rawtx?: string;
+    error?: string | Error;
 }
 export interface IOrderStatusInfo {
     amount: number;

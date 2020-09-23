@@ -37,11 +37,12 @@ export interface IAutoPaymentOrder {
 }
 
 export interface IOrderResponseData {
-  order_sn: string;
-  pay_txid: string;
-  paytxid: string;
-  txid: string;
-  rawtx: string;
+  order_sn?: string;
+  pay_txid?: string;
+  paytxid?: string;
+  txid?: string;
+  rawtx?: string;
+  error?: string | Error;
 }
 
 export interface IOrderStatusInfo {
