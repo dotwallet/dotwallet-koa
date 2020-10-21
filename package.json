@@ -1,6 +1,6 @@
 {
   "name": "dotwallet-koa",
-  "version": "1.0.32",
+  "version": "1.0.341",
   "description": "An SDK for quickly building a Koa.js server that uses dotwallet's APIs",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

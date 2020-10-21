@@ -51,9 +51,7 @@ class DotWallet {
    * @returns { IOrderResponseData } The order
    */
   autopayment: (
-    ctx: Context,
     orderData: IAutoPaymentOrder,
-    redirect?: string | undefined,
     log?: boolean | undefined,
   ) => Promise<IOrderResponseData | Error | undefined>;
   getHostedAccount: (coinType?: string, log?: boolean | undefined) => Promise<IGetHostedResponse | Error | undefined>;

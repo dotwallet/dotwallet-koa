@@ -31,7 +31,7 @@ declare class DotWallet {
      * @param { string } redirect must be a valid http or https url string. if supplied, will redirect the user to the initialize micropayments screen when their balance is too low. Afterwards the user will be redirected to the supplied url
      * @returns { IOrderResponseData } The order
      */
-    autopayment: (ctx: Context, orderData: IAutoPaymentOrder, redirect?: string | undefined, log?: boolean | undefined) => Promise<IOrderResponseData | Error | undefined>;
+    autopayment: (orderData: IAutoPaymentOrder, log?: boolean | undefined) => Promise<IOrderResponseData | Error | undefined>;
     getHostedAccount: (coinType?: string, log?: boolean | undefined) => Promise<IGetHostedResponse | Error | undefined>;
     hostedAccountBalance: (coinType?: string, log?: boolean | undefined) => Promise<IGetBalanceResponse | Error | undefined>;
     /**
